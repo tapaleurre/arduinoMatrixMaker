@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 
 public class ActionButton extends JButton implements MouseListener {
     private final ButtonType type;
@@ -22,7 +21,7 @@ public class ActionButton extends JButton implements MouseListener {
                 Main.gui.update(Main.gui.getGraphics());
             }
         }else if (type == ButtonType.CONFIRM){
-
+            Main.convertPic();
         }
 
     }

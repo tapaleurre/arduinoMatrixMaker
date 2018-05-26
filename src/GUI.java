@@ -13,8 +13,12 @@ public class GUI extends JFrame {
         JPanel buttonOne = new JPanel();
         ActionButton buttonLoadFile = new ActionButton("Select file", ButtonType.FILE_SELECTION);
         buttonOne.add(buttonLoadFile);
+        JPanel buttonTwo = new JPanel();
+        ActionButton buttonConfirm = new ActionButton("Confirm", ButtonType.CONFIRM);
+        buttonTwo.add(buttonConfirm);
 
         bLayout.add(buttonOne);
+        bLayout.add(buttonTwo);
         Container content = this.getContentPane();
         content.add(bLayout);
         this.setVisible(true);
