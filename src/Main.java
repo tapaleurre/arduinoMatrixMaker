@@ -32,6 +32,7 @@ public class Main {
         }
         String finalFile ="";
         int sup = (width * 3) % 4;
+        width = width/8;
         finalFile+="{";
         for(int i=0; i<height; i++){
             finalFile+="{";
@@ -40,11 +41,11 @@ public class Main {
             }
             finalFile = finalFile.substring(0, finalFile.length() -1);
             finalFile+="},";
-            try {
+            /*try {
                 inBMP.skipBytes(sup);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         finalFile = finalFile.substring(0, finalFile.length() -1);
         finalFile+="}";
@@ -73,6 +74,11 @@ public class Main {
         byte[] b = new byte[4];
         String string = "0b";
         try{
+            in.read(b);
+            string+=convertBin(b[0]);
+            string+=convertBin(b[1]);
+            string+=convertBin(b[2]);
+            string+=convertBin(b[3]);
             in.read(b);
             string+=convertBin(b[0]);
             string+=convertBin(b[1]);
