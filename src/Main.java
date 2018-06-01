@@ -1,7 +1,12 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class Main {
     public static GUI gui;
@@ -12,7 +17,7 @@ public class Main {
     }
 
     public static String convertPic() {
-        int height=0;
+        /*int height=0;
         int width=0;
         DataInputStream inBMP=null;
         try{
@@ -35,22 +40,60 @@ public class Main {
         width = width/8;
         finalFile+="{";
         for(int i=0; i<height; i++){
-            finalFile+="{";
             for(int j=0; j<width; j++){
                 finalFile+=codeInt(inBMP)+",";
             }
-            finalFile = finalFile.substring(0, finalFile.length() -1);
-            finalFile+="},";
+            //finalFile = finalFile.substring(0, finalFile.length() -1);
+            //finalFile+="},";
             /*try {
                 inBMP.skipBytes(sup);
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
         finalFile = finalFile.substring(0, finalFile.length() -1);
         finalFile+="}";
         System.out.print(finalFile);
-        return finalFile;
+        return finalFile;*/
+        ImageBMP imageFile = ImageBMP.readFromFileAtPath(Main.selectedFile.getAbsolutePath());
+        BufferedImage imageinfo = imageFile.convertToSystemImage();
+        int height = imageinfo.getHeight();
+        int width = imageinfo.getWidth();
+        int way = 1;
+        LinkedList<Boolean> systemImage = imageFile.convertToBoolList();
+        String file = "{";
+        for(int h = 0; h < height; h++){
+            if(way == 1){
+                for(int w = 0; w < width; w=w+8){
+                    //System.out.println("x:"+w+" y:"+h);
+                    file+=makeBinaryRepresentation(systemImage.get(h*width+w),
+                            systemImage.get(h*width+w+1),
+                            systemImage.get(h*width+w+2),
+                            systemImage.get(h*width+w+3),
+                            systemImage.get(h*width+w+4),
+                            systemImage.get(h*width+w+5),
+                            systemImage.get(h*width+w+6),
+                            systemImage.get(h*width+w+7))+",";
+                }
+            }else{
+                for(int w = width-1; w >= 0; w=w-8){
+                    //System.out.println("x:"+w+" y:"+h);
+                    file+=makeBinaryRepresentation(systemImage.get(h*width+w),
+                            systemImage.get(h*width+w-1),
+                            systemImage.get(h*width+w-2),
+                            systemImage.get(h*width+w-3),
+                            systemImage.get(h*width+w-4),
+                            systemImage.get(h*width+w-5),
+                            systemImage.get(h*width+w-6),
+                            systemImage.get(h*width+w-7))+",";
+                }
+            }
+            way = way*-1;
+        }
+        file = file.substring(0, file.length() -1);
+        file+="}";
+        System.out.println(file);
+        return file;
     }
 
     private static int readInt(DataInputStream in){
@@ -96,5 +139,31 @@ public class Main {
         }else{
             return "0";
         }
+    }
+    private static String convertBin(int chunk){
+        if(chunk != 0){
+            return "1";
+        }else{
+            return "0";
+        }
+    }
+    private static String convertBin(Boolean chunk){
+        if(chunk.booleanValue()){
+            return "1";
+        }else{
+            return "0";
+        }
+    }
+    private static String makeBinaryRepresentation(boolean b1,boolean b2,boolean b3,boolean b4,boolean b5,boolean b6,boolean b7,boolean b8){
+        String result="0b";
+            result += ""+b2o(b1)+b2o(b2)+b2o(b3)+b2o(b4)+b2o(b5)+b2o(b6)+b2o(b7)+b2o(b8);
+        return result;
+    }
+    private static int b2o(boolean b){
+        int i = 0;
+        if(b){
+            i=1;
+        }
+        return i;
     }
 }
