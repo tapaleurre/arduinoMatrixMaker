@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.3  (Win32)">
+	<META NAME="CREATED" CONTENT="20180602;13253362">
+	<META NAME="CHANGED" CONTENT="20180602;15191665">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H1 { margin-bottom: 0.21cm }
+		H1.western { font-family: "Arial", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "Microsoft YaHei"; font-size: 16pt }
+		H1.ctl { font-family: "Lucida Sans"; font-size: 16pt }
+		H2 { margin-bottom: 0.21cm }
+		H2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "Microsoft YaHei"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-style: italic }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="fr-FR" DIR="LTR">
+<H1 CLASS="western" ALIGN=CENTER>How to make an automated drawer for
+splatoon2 on switch</H1>
+<H2 CLASS="western">What you will need&nbsp;:</H2>
+<UL>
+	<LI><P>A Nintendo Switch with splatoon 2 (Obviously)</P>
+	<LI><P>A dock and a TV + A usb controller that you're willing to
+	destroy (pokken tournament controller is cheap and easy to crack
+	open)</P>
+	<UL>
+		<LI><P>OR</P>
+	</UL>
+	<LI><P>A wireless controller that you're willing to destroy</P>
+	<LI><P>An arduino with at least 8kb of memory <SPAN LANG="fr-FR">and
+	its usb cord</SPAN></P>
+	<LI><P><SPAN LANG="fr-FR">A PC with java 8 jre and the arduino
+	software installed.</SPAN></P>
+	<LI><P>Solder iron and solder</P>
+	<LI><P>One 180 <FONT FACE="Times New Roman, serif">&Omega;</FONT><FONT FACE="Times New Roman, serif">
+	resistor (could work with bigger ones)</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">1 30v NPN transistor for
+	each button you want to automate (Minimum 4)</FONT></P>
+</UL>
+<H2 CLASS="western"><FONT FACE="Times New Roman, serif">Preparing the
+controller&nbsp;:</FONT></H2>
+<P><FONT FACE="Times New Roman, serif">On most controllers, there's a
+unique singal that will input a button press if you connect it with
+said button's receptor. Each button has the signal on a side and the
+button specific recpetor in the other, you just have to test to see
+where is the signal and where are the receptors. Find a good place to
+solder your wires, but avoid the buttons themselves if you want to be
+able to still manually press the buttons once you get your controller
+back together.</FONT></P>
+<P><IMG SRC="howto_html_m7bc95181.gif" NAME="images1" ALIGN=LEFT WIDTH=643 HEIGHT=361 BORDER=0><BR CLEAR=LEFT><FONT FACE="Times New Roman, serif">This
+is the layout i used with the pokken controller, you can add more
+buttons if you have other projects (i plan on adding an auto init
+sequence, the up and L1buttons will be useful)&nbsp;:</FONT></P>
+<P><FONT FACE="Times New Roman, serif">Solder a wire to each of
+those, test if touching the signal bus with a button receptor trigger
+a button press on the switch, get the controller back together makind
+sure the wires all poke out and and go on.</FONT></P>
+<H2 CLASS="western"><FONT FACE="Times New Roman, serif">Wire the
+controller to the arduino&nbsp;:</FONT></H2>
+<P><FONT FACE="Times New Roman, serif">To be able to activate buttons
+we will use PNP transistors. The Emitter of the transistor will be
+plugged to the button specific receiver, the collector to the signal
+bus and the base to the arduino pins.<IMG SRC="https://circuitdigest.com/sites/default/files/field/image/PNP-Transistors_0.png" NAME="images2" ALIGN=BOTTOM WIDTH=645 HEIGHT=253 BORDER=0></FONT></P>
+<P> <FONT FACE="Times New Roman, serif">This is how everything should
+be plugged&nbsp;:</FONT></P>
+<H2 CLASS="western"><IMG SRC="howto_html_7ad0e93f.gif" NAME="images3" ALIGN=LEFT WIDTH=643 HEIGHT=263 BORDER=0><BR CLEAR=LEFT><FONT FACE="Times New Roman, serif">Prepare
+the picture&nbsp;:</FONT></H2>
+<P><FONT FACE="Times New Roman, serif">You will need a picture to
+send to your switch&nbsp;:</FONT></P>
+<UL>
+	<LI><P><FONT FACE="Times New Roman, serif">320px * 120px</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">24 bits colors bmp file</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">All non white pixels
+	(0xFFFFFF) will be converted to black</FONT></P>
+</UL>
+<P><FONT FACE="Times New Roman, serif">Save the picture in your
+computer.</FONT></P>
+<H2 CLASS="western"><FONT FACE="Times New Roman, serif">Use the
+software&nbsp;:</FONT></H2>
+<UL>
+	<LI><P><FONT FACE="Times New Roman, serif">Download the file
+	''arduinoMatrixMaker.jar''</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Double click on it, a
+	window should open</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Click ''Select file'' and
+	use the explorer to find your bmp file</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Click ''Confirm'' to
+	generate the arduino project</FONT></P>
+</UL>
+<H2 CLASS="western"><FONT FACE="Times New Roman, serif">Upload the
+project to your arduino&nbsp;:</FONT></H2>
+<UL>
+	<LI><P><FONT FACE="Times New Roman, serif">Open the file
+	''upload_this_to_your_arduino/upload_this_to_your_arduino.ino'' 
+	that appeared in the directory where the jar file is with the
+	arduino software.</FONT></P>
+	<LI><P><IMG SRC="howto_html_510823ad.gif" NAME="images4" ALIGN=LEFT WIDTH=430 HEIGHT=329 BORDER=0><BR CLEAR=LEFT><FONT FACE="Times New Roman, serif">Click
+	on the arrow to upload the project to the arduino.</FONT></P>
+</UL>
+<H2 CLASS="western"><FONT FACE="Times New Roman, serif">Draw the
+picture on the switch&nbsp;:</FONT></H2>
+<UL>
+	<LI><P><FONT FACE="Times New Roman, serif">Plug your modified
+	controller.</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Make sure the Arduino has
+	a reliable source of power plugged in.</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Start splatoon and go to
+	the plaza to draw your picture.</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Place your cursor in the
+	top left corner with the smallest pen size.</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Make sure the modified
+	controller is the active one (press a button on it and if a menu
+	appear press A until you're back in game).</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Press the button we
+	wired.</FONT></P>
+	<LI><P><FONT FACE="Times New Roman, serif">Wait a while for the
+	process to finish.</FONT></P>
+</UL>
+</BODY>
+</HTML>
