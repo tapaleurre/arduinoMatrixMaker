@@ -1,71 +1,29 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
+import BMPTools.*;
 
 public class Main {
     public static GUI gui;
     public static File selectedFile;
-    private static final int MASK = 0xFF;
     public static void main(String args[]){
         gui = new GUI();
     }
 
     public static String convertPic() {
-        /*int height=0;
-        int width=0;
-        DataInputStream inBMP=null;
-        try{
-        inBMP = new DataInputStream(new FileInputStream(selectedFile));
-
-        //On va lire le début de l'entête
-        inBMP.skipBytes(18);
-
-        //Maintenant, on lit la largeur et la hauteur de l'image
-        width = readInt(inBMP);
-        height = readInt(inBMP);
-        System.out.println("Width = "+width+"    Height="+height);
-
-        //On saute les données inutiles del'entête 28
-        inBMP.skipBytes(528);} catch (Exception e){
-            System.err.println("Couldn't read file");
-        }
-        String finalFile ="";
-        int sup = (width * 3) % 4;
-        width = width/8;
-        finalFile+="{";
-        for(int i=0; i<height; i++){
-            for(int j=0; j<width; j++){
-                finalFile+=codeInt(inBMP)+",";
-            }
-            //finalFile = finalFile.substring(0, finalFile.length() -1);
-            //finalFile+="},";
-            /*try {
-                inBMP.skipBytes(sup);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        finalFile = finalFile.substring(0, finalFile.length() -1);
-        finalFile+="}";
-        System.out.print(finalFile);
-        return finalFile;*/
         ImageBMP imageFile = ImageBMP.readFromFileAtPath(Main.selectedFile.getAbsolutePath());
-        BufferedImage imageinfo = imageFile.convertToSystemImage();
-        int height = imageinfo.getHeight();
-        int width = imageinfo.getWidth();
+        BufferedImage imageInfo = imageFile.convertToSystemImage();
+        int height = imageInfo.getHeight();
+        int width = imageInfo.getWidth();
         int way = 1;
         LinkedList<Boolean> systemImage = imageFile.convertToBoolList();
         String file = "{";
         for(int h = 0; h < height; h++){
             if(way == 1){
                 for(int w = 0; w < width; w=w+8){
-                    //System.out.println("x:"+w+" y:"+h);
                     file+=makeBinaryRepresentation(systemImage.get(h*width+w),
                             systemImage.get(h*width+w+1),
                             systemImage.get(h*width+w+2),
@@ -77,7 +35,6 @@ public class Main {
                 }
             }else{
                 for(int w = width-1; w >= 0; w=w-8){
-                    //System.out.println("x:"+w+" y:"+h);
                     file+=makeBinaryRepresentation(systemImage.get(h*width+w),
                             systemImage.get(h*width+w-1),
                             systemImage.get(h*width+w-2),
@@ -90,69 +47,21 @@ public class Main {
             }
             way = way*-1;
         }
+        new File("upload_this_to_your_arduino").mkdirs();
+        new File("upload_this_to_your_arduino/upload_this_to_your_arduino.ino").delete();
         file = file.substring(0, file.length() -1);
         file+="}";
+        try {
+            PrintWriter writer = new PrintWriter("upload_this_to_your_arduino/upload_this_to_your_arduino.ino", "UTF-8");
+            writer.write(makeArduinoCode(file));
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         System.out.println(file);
         return file;
-    }
-
-    private static int readInt(DataInputStream in){
-        byte[] b = new byte[4];
-        int result = 0;
-
-        try{
-            in.read(b);
-            result = b[0] & MASK;
-            result = result + ((b[1] & MASK) << 8);
-            result = result + ((b[2] & MASK) << 16);
-            result = result + ((b[3] & MASK) << 24);
-        }
-        catch(Exception e){
-            System.err.println("Idk can't read file anymore");
-        }
-
-        return result;
-    }
-    private static String codeInt(DataInputStream in){
-        byte[] b = new byte[4];
-        String string = "0b";
-        try{
-            in.read(b);
-            string+=convertBin(b[0]);
-            string+=convertBin(b[1]);
-            string+=convertBin(b[2]);
-            string+=convertBin(b[3]);
-            in.read(b);
-            string+=convertBin(b[0]);
-            string+=convertBin(b[1]);
-            string+=convertBin(b[2]);
-            string+=convertBin(b[3]);
-        }
-        catch(Exception e){
-            System.err.println("Idk can't read file anymore");
-        }
-        return string;
-    }
-    private static String convertBin(byte chunk){
-        if(chunk != 0){
-            return "1";
-        }else{
-            return "0";
-        }
-    }
-    private static String convertBin(int chunk){
-        if(chunk != 0){
-            return "1";
-        }else{
-            return "0";
-        }
-    }
-    private static String convertBin(Boolean chunk){
-        if(chunk.booleanValue()){
-            return "1";
-        }else{
-            return "0";
-        }
     }
     private static String makeBinaryRepresentation(boolean b1,boolean b2,boolean b3,boolean b4,boolean b5,boolean b6,boolean b7,boolean b8){
         String result="0b";
@@ -165,5 +74,96 @@ public class Main {
             i=1;
         }
         return i;
+    }
+    private static String makeArduinoCode(String image){
+        String result = "#include <avr/pgmspace.h>\n" +
+                "#define PRESS 9\n" +
+                "#define DOWN 10\n" +
+                "#define RIGHT 11\n" +
+                "#define LEFT 12\n" +
+                "#define UP 13\n" +
+                "#define TIMING 45\n" +
+                "#define SWITCH 8\n" +
+                "\n" +
+                "const byte image[] PROGMEM="+image+";\n" +
+                "const int width = 320;\n" +
+                "const int height = 120;\n" +
+                "//const int width = 80;\n" +
+                "//const int height = 2;\n" +
+                "void press(int button){\n" +
+                "    digitalWrite(button,LOW);\n" +
+                "    delay(TIMING);\n" +
+                "    digitalWrite(button,HIGH);  \n" +
+                "  }\n" +
+                "void pressTwo(int button1, int button2){\n" +
+                "  delay(TIMING);\n" +
+                "  digitalWrite(button1,LOW);\n" +
+                "  delay(TIMING);\n" +
+                "  digitalWrite(button1, HIGH);\n" +
+                "  digitalWrite(button2, LOW);\n" +
+                "  delay(TIMING);\n" +
+                "  digitalWrite(button2,HIGH);\n" +
+                "  \n" +
+                "}\n" +
+                "void sendPixel(boolean pixel, char way){\n" +
+                "  if(pixel){\n" +
+                "    press(PRESS);\n" +
+                "  }else{\n" +
+                "    delay(TIMING);\n" +
+                "  }\n" +
+                "  delay(TIMING);\n" +
+                "  press(way);\n" +
+                "  delay(TIMING);\n" +
+                "}\n" +
+                "\n" +
+                "void setup() {\n" +
+                "  // put your setup code here, to run once:\n" +
+                "  pinMode(PRESS,OUTPUT);\n" +
+                "  pinMode(DOWN,OUTPUT);\n" +
+                "  pinMode(RIGHT,OUTPUT);\n" +
+                "  pinMode(LEFT,OUTPUT);\n" +
+                "  pinMode(UP,OUTPUT);\n" +
+                "  pinMode(SWITCH,INPUT);\n" +
+                "  digitalWrite(PRESS,HIGH);\n" +
+                "  digitalWrite(DOWN,HIGH);\n" +
+                "  digitalWrite(RIGHT,HIGH);\n" +
+                "  digitalWrite(LEFT,HIGH);\n" +
+                "  digitalWrite(UP,HIGH);\n" +
+                "  Serial.begin(9600);\n" +
+                "}\n" +
+                "\n" +
+                "void loop() {\n" +
+                "  // put your main code here, to run repeatedly:\n" +
+                "    if(digitalRead(SWITCH) == HIGH){\n" +
+                "    int i=0;\n" +
+                "    int j=0;\n" +
+                "    short k;\n" +
+                "    int translation;\n" +
+                "    char way = 1;\n" +
+                "    boolean pixel=true;\n" +
+                "    int len = height*(width/8);\n" +
+                "    for(i=0; i< len ; i++){\n" +
+                "        for(k = 7; 0 <= k; k--){\n" +
+                "             pixel = (pgm_read_byte_near(image+i) >> k) & 0b00000001;//parcours charque bit du plus lourd au plus léger\n" +
+                "           if(way == -1){\n" +
+                "            sendPixel(pixel,LEFT);\n" +
+                "           }else{\n" +
+                "            sendPixel(pixel,RIGHT);\n" +
+                "           }\n" +
+                "      }\n" +
+                "\n" +
+                "      j=j+8;\n" +
+                "      if(j >= width){\n" +
+                "        sendPixel(pixel, DOWN);\n" +
+                "        way = -way;\n" +
+                "        j=0;\n" +
+                "      }\n" +
+                "//    pixel=!pixel;\n" +
+                "    }\n" +
+                "   }\n" +
+                "   delay(200);\n" +
+                "\n" +
+                "}";
+        return result;
     }
 }
